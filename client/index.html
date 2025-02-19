@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Music Visualizer</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        
+        #debug {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <input type="file" id="audioFile" accept="audio/*">
+    </div>
+    <!-- <div id="debug">
+        Status: <span id="status">Waiting for file...</span><br>
+        FPS: <span id="fps">0</span>
+    </div> -->
+
+    <!-- Import maps for module resolution -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Load application -->
+    <script type="module" src="src/app.js"></script>
+
+    <script>
+        // Add some basic error handling
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            document.getElementById('status').textContent = 'Error: ' + event.error.message;
+        });
+    </script>
+</body>
+</html>
