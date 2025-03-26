@@ -5,34 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Music Visualizer</title>
     <style>
-        body { margin: 0; overflow: hidden; }
+        body { 
+            margin: 0; 
+            overflow: hidden;
+            background: #000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         #controls {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 100;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-        }
+            /* background: rgba(0, 0, 0, 0.95); */
+            padding: 2rem;
+            
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-width: 300px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         
-        #debug {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 100;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-            font-family: monospace;
+        }
+
+        #controls.file-selected {
+            top: 2rem;
+            right: 2rem;
+            left: auto;
+            transform: translateX(0);
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem;
+            min-width: auto;
+            background: rgba(0, 0, 0, 0.98);
+        }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #controls.file-selected .file-input-container {
+            width: auto;
+            margin-right: 1rem;
+        }
+
+        #audioFile {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #controls.file-selected .button-group {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: #000;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+        }
+
+        .button-group button:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        #playPause, #restart {
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Subtle glow animation */
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+            50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); }
+            100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+        }
+
+        #controls {
+            animation: glow 3s infinite;
+        }
+
+        /* Slide-in animation for buttons */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scale animation for file input */
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.98);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        /* Add a subtle shine effect on hover */
+        .button-group button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .button-group button:hover::after {
+            left: 100%;
         }
     </style>
 </head>
 <body>
     <div id="controls">
-        <input type="file" id="audioFile" accept="audio/*">
+        <div class="file-input-container">
+            <label for="audioFile" class="file-input-label">Choose Audio File</label>
+            <input type="file" id="audioFile" accept="audio/*">
+        </div>
+        <div class="button-group">
+            <button id="playPause">Play</button>
+            <button id="restart">Restart</button>
+        </div>
     </div>
     <!-- <div id="debug">
         Status: <span id="status">Waiting for file...</span><br>
@@ -53,6 +207,13 @@
     <script type="module" src="src/app.js"></script>
 
     <script>
+        // Add UI transition handling
+        document.getElementById('audioFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                document.getElementById('controls').classList.add('file-selected');
+            }
+        });
+
         // Add some basic error handling
         window.addEventListener('error', (event) => {
             console.error('Global error:', event.error);

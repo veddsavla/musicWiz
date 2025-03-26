@@ -1,12 +1,17 @@
 :root {
-    --primary: #1a1a1a;
+    --primary: #121212;
     --secondary: #00ff88;
+    --accent: #ffffff;
+    --border-radius: 12px;
+    --transition: all 0.3s ease-in-out;
 }
 
 body {
     margin: 0;
     background: var(--primary);
     font-family: 'Inter', sans-serif;
+    color: var(--accent);
+    overflow: hidden;
 }
 
 #visualizerCanvas {
@@ -15,20 +20,69 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.1), transparent);
 }
 
+/* Upload Container */
 .upload-container {
     position: fixed;
     top: 2rem;
     right: 2rem;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
 }
 
+/* File Input Styling */
 input[type="file"] {
-    background: rgba(0,0,0,0.7);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--secondary);
-    padding: 1rem;
+    padding: 1rem 1.5rem;
     border: 2px solid var(--secondary);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+/* Hover & Focus Effects */
+input[type="file"]:hover, 
+input[type="file"]:focus {
+    background: var(--secondary);
+    color: var(--primary);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+/* File Input Custom Cursor */
+input[type="file"]::file-selector-button {
+    background: var(--secondary);
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--primary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--accent);
+    color: var(--primary);
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+    .upload-container {
+        top: 1rem;
+        right: 1rem;
+    }
+
+    input[type="file"] {
+        font-size: 0.9rem;
+        padding: 0.75rem 1.25rem;
+    }
 }
